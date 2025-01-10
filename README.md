@@ -51,5 +51,33 @@ Os testes realizados demonstraram a capacidade do sistema de gerar sinais precis
 
 ![Exemplo de sinal senoidal](images/senoide.png)
 
+## 🔧 Instalação e Uso
 
-Autor: [Miguel L. Rodrigues](miguellukas52@gmail.com)
+1. Clone este repositório:
+   ```bash
+   git clone https://github.com/miguellrodrigues/trabalho_sistemas_digitais.git
+   ```
+
+2. Configure o ambiente ESP-IDF para compilar e carregar o firmware.
+
+3. Conecte os componentes físicos conforme o diagrama na pasta `/docs`.
+
+4. Utilize os botões físicos para alterar os parâmetros do sinal.
+
+## 📝 Referências
+
+- Tocci, R.J., et al. **Sistemas Digitais: Princípios e Aplicações**, Pearson, 2016.
+- Lathi, B.P., et al. **Modern Digital and Analog Communication Systems**, Oxford University Press, 2009.
+- Haykin, S., et al. **Communication Systems**, Wiley, 2007.
+
+## 🔮 Melhorias Futuras
+
+- Adicionar interface gráfica para controle remoto via IoT.
+- Expandir as formas de onda suportadas para incluir formas arbitrárias.
+- Sincronização com outros dispositivos via protocolos de comunicação.
+
+---
+
+**Autor:** Miguel L. Rodrigues  
+**Email:** [miguellukas52@gmail.com](mailto:miguellukas52@gmail.com)  
+**Repositório:** [GitHub - Trabalho Sistemas Digitais](https://github.com/miguellrodrigues/trabalho_sistemas_digitais)
