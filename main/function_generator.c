@@ -8,6 +8,7 @@
 #include <driver/mcpwm_oper.h>
 #include <driver/mcpwm_cmpr.h>
 #include <driver/temperature_sensor.h>
+#include <driver/gptimer.h>
 #include <esp_timer.h>
 #include <i2c_device.h>
 #include <lcd.h>
@@ -75,6 +76,39 @@ bool on_full_callback(mcpwm_timer_handle_t timer, const mcpwm_timer_event_data_t
     }
 
     return false;
+}
+
+bool on_alarm(gptimer_handle_t timer, const gptimer_alarm_event_data_t *edata, void *user_ctx)
+{
+
+    return false;
+}
+
+void foo() {
+    gptimer_handle_t timer;
+    gptimer_config_t config = {
+            .clk_src = GPTIMER_CLK_SRC_DEFAULT,
+            .intr_priority = 1,
+            .direction = GPTIMER_COUNT_UP,
+            .resolution_hz = 10 * MEGA,
+    };
+
+    ESP_ERROR_CHECK(gptimer_new_timer(&config, &timer));
+
+    gptimer_alarm_config_t alarmConfig = {
+            .reload_count = 0,
+            .alarm_count = 10 * MEGA,
+            .flags = {.auto_reload_on_alarm = true},
+    };
+
+    ESP_ERROR_CHECK(gptimer_set_alarm_action(timer, &alarmConfig));
+
+    gptimer_event_callbacks_t callbacks = {.on_alarm = on_alarm};
+
+    ESP_ERROR_CHECK(gptimer_register_event_callbacks(timer, &callbacks, NULL));
+
+    ESP_ERROR_CHECK(gptimer_enable(timer));
+    ESP_ERROR_CHECK(gptimer_start(timer));
 }
 
 void setup_signal_timer() {
@@ -315,7 +349,6 @@ _Noreturn void app_main() {
     lcd_init(lcd);
 
     temperature_sensor_handle_t temperature_sensor = init_temperature_sensor();
-
     xTaskCreate(temperature_log_task, "temperature_log_task", 2048, temperature_sensor, 5, NULL);
 
     while (1) {
