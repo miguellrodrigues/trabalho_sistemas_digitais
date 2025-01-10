@@ -50,3 +50,6 @@ Os testes realizados demonstraram a capacidade do sistema de gerar sinais precis
 4. Quadrada
 
 ![Exemplo de sinal senoidal](images/senoide.png)
+
+
+Autor: [Miguel L. Rodrigues](miguellukas52@gmail.com)
