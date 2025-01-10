@@ -3,11 +3,12 @@
 #include <math.h>
 #include <esp_log.h>
 #include <driver/gpio.h>
-#include "driver/mcpwm_timer.h"
-#include "driver/mcpwm_gen.h"
-#include "driver/mcpwm_oper.h"
-#include "driver/mcpwm_cmpr.h"
-#include "esp_timer.h"
+#include <driver/mcpwm_timer.h>
+#include <driver/mcpwm_gen.h>
+#include <driver/mcpwm_oper.h>
+#include <driver/mcpwm_cmpr.h>
+#include <driver/temperature_sensor.h>
+#include <esp_timer.h>
 #include <i2c_device.h>
 #include <lcd.h>
 
@@ -275,6 +276,34 @@ void init_i2c() {
     lcd = init_device(LCD_ADDRESS, bus_handle);
 }
 
+temperature_sensor_handle_t init_temperature_sensor() {
+    temperature_sensor_handle_t sensor_handle;
+    temperature_sensor_config_t sensor_config = {
+            .range_min = 10,
+            .range_max = 35,
+    };
+
+    temperature_sensor_install(&sensor_config, &sensor_handle);
+    temperature_sensor_enable(sensor_handle);
+
+    return sensor_handle;
+}
+
+float get_chip_temperature(temperature_sensor_handle_t sensor_handle) {
+    float celsius;
+    return temperature_sensor_get_celsius(sensor_handle, &celsius) == ESP_OK ? celsius : 0.0f;
+}
+
+void temperature_log_task(void *pvParameters) {
+    temperature_sensor_handle_t sensor_handle = (temperature_sensor_handle_t) pvParameters;
+
+    while (1) {
+        float celsius = get_chip_temperature(sensor_handle);
+        ESP_LOGI(TAG, "Chip temperature: %f", celsius);
+        vTaskDelay(pdMS_TO_TICKS(10000));
+    }
+}
+
 _Noreturn void app_main() {
     populate_tables();
 
@@ -283,8 +312,11 @@ _Noreturn void app_main() {
     setup_signal_timer();
 
     init_i2c();
-
     lcd_init(lcd);
+
+    temperature_sensor_handle_t temperature_sensor = init_temperature_sensor();
+
+    xTaskCreate(temperature_log_task, "temperature_log_task", 2048, temperature_sensor, 5, NULL);
 
     while (1) {
         vTaskDelay(pdMS_TO_TICKS(10));
